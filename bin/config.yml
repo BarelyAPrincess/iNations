@@ -1,0 +1,12 @@
+global:
+    motd: 'Welcome to the United Federation of Harmony.'
+    autofence: true
+    ownershipdepth: 0
+    ownershipheight: 0
+    minpop: 5
+    minarea: 100
+    maxpop: 50
+    maxarea: 10000
+    primaryArea: ''
+    protectbuilds: true
+    maxperplayer: 3

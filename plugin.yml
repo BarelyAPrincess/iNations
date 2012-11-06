@@ -1,0 +1,13 @@
+name: iNations
+author: Chiori Greene
+main: com.chiorichan.bukkit.plugin.iNations.INations
+version: '0.1'
+depends: [Vault]
+
+commands:
+     iplayer:
+          description: iNations Command Subroutine for Players.
+          usage: /iplayer <subcommand>
+     iadmin:
+          description: iNations Command Subroutine for Admins.
+          usage: /iadmin <subcommand>

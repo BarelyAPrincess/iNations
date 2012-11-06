@@ -1,0 +1,20 @@
+global:
+    motd: 'Welcome to the United Federation of Harmony.'
+    autofence: true
+    autostack: true
+    autotorches: true
+    ownershipdepth: 0
+    ownershipheight: 0
+    minpop: 5
+    minarea: 100
+    minplots: 2
+    maxdistance: 30
+    maxpop: 50
+    maxarea: 10000
+    primaryArea: ''
+    protectbuilds: true
+    allowanimals: true
+    allowbadmobs: true
+    allowothermobs: true
+    alloweggspawns: true
+    maxperplayer: 3
