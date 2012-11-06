@@ -4,6 +4,7 @@ import org.bukkit.World;
 
 import com.sk89q.worldedit.Vector;
 
+
 public class Community extends Cuboid {
 	
 	

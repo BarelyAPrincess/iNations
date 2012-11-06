@@ -5,8 +5,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.World;
-import org.bukkit.util.BlockVector;
-import org.bukkit.util.Vector;
+
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.data.ChunkStore;
 
 public class Cuboid implements Region {
 	protected World world;
@@ -336,9 +339,4 @@ public class Cuboid implements Region {
 	 {
 		 this.world = w;
 	 }
-
-	public boolean contains(com.sk89q.worldedit.Vector pt) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

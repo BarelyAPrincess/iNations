@@ -3,14 +3,12 @@ package com.chiorichan.bukkit.plugin;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import java.util.Map.Entry;
 
 import com.chiorichan.bukkit.plugin.iNations.INations;
+import com.sk89q.worldedit.Vector;
 
 public class PlotDataStore {
-	@SuppressWarnings("unused")
 	private INations plugin;
 	
 	public Map<String, Plot> plots = new HashMap<String, Plot>();
@@ -46,6 +44,21 @@ public class PlotDataStore {
     	return null;
     }
     
+    @SuppressWarnings("unused")
+	private org.bukkit.util.Vector VectorSwap(Vector vector)
+    {
+    	return new org.bukkit.util.Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+    }
+    
+    private Vector VectorSwap(org.bukkit.util.Vector vector)
+    {
+    	return new Vector(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+    }
+    
+	public Plot getPlotFromVector(org.bukkit.util.Vector vector) {
+    	return this.getPlotFromVector(VectorSwap(vector));
+	}
+    
     public Plot getPlotFromVector (Vector vector)
     {
     	for (Plot cube : plots.values())
@@ -57,20 +70,23 @@ public class PlotDataStore {
     	return null;
     }
     
-    public Boolean isAuthorized (Player p, Community plot, String perm)
-    {
-    	// TODO: FINISH
-    	return false;
-    }
-    
-    public Boolean isAuthorized (Player p, Plot plot, String perm)
-    { 	
-    	// TODO: FINISH
-    	return false;
-    }
-    
     public Collection<Plot> values ()
     {
     	return plots.values();
     }
+
+	public void savePlots()
+	{
+		HashMap<String, Object> conf = new HashMap<String, Object>();
+		
+		for (Plot cube : plots.values())
+    	{
+			conf = cube.serialize();
+			
+			for ( Entry<String, Object> obj : conf.entrySet() )
+			{
+				plugin.getConfig().set(obj.getKey(), obj.getValue());
+			}
+    	}
+	}
 }

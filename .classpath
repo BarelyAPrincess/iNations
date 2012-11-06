@@ -24,5 +24,9 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/Tekkit.jar"/>
 	<classpathentry kind="lib" path="libs/Vault.jar"/>
+	<classpathentry kind="lib" path="libs/WorldEdit.jar"/>
+	<classpathentry kind="lib" path="libs/WGCustomFlags.jar"/>
+	<classpathentry kind="lib" path="libs/WGRegionEvents.jar"/>
+	<classpathentry kind="lib" path="libs/WorldGuard.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

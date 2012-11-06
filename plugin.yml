@@ -11,3 +11,15 @@ commands:
      iadmin:
           description: iNations Command Subroutine for Admins.
           usage: /iadmin <subcommand>
+     inv:
+          description: Allows viewing of anothers players inventory.
+          usage: /inv <playername>
+     clear:
+          description: Allows for instant clear of inventory.
+          usage: /clear [h/i]
+     t:
+          description: Allows for private chat for staff even when hidden. Alt Colors Supported.
+          usage: /t <playersname> <message>
+     goto:
+          description: Allows you to teleport to players. Gives OP's a warning of teleport.
+          usage: /goto <playersname>

@@ -1,17 +1,28 @@
 package com.chiorichan.bukkit.plugin.iNations;
 
+import java.util.List;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.Plugin;
 
 import com.chiorichan.bukkit.plugin.Plot;
+import com.sk89q.worldedit.Vector;
 
 public class INationsCommandExecutor implements CommandExecutor {
 	private INations plugin;
@@ -26,13 +37,192 @@ public class INationsCommandExecutor implements CommandExecutor {
     		player = (Player) sender;
     	}
     	
-    	if (player == null)
+    	String consoleWarning = ChatColor.RED + "You can not use that command from within console.";
+    	
+    	if ( cmd.getName().equalsIgnoreCase("inv") ) // View inventory of storage blocks and other players
     	{
-    		sender.sendMessage("You can not use that command from within console.");
-    		return false;
+    		if ( player == null )
+			{
+				sender.sendMessage(consoleWarning);
+        		return true;    				
+			}
+    		
+    		if ( args.length < 1)
+			{
+    			Block b = player.getTargetBlock(null, 100);
+    			
+    			if ( b.getState() instanceof Chest )
+    			{
+    				Chest c = (Chest) b.getState();
+    				
+    				Inventory i = c.getInventory();
+    				
+    				if ( i != null )
+    					player.openInventory(i);
+    				
+    				player.sendMessage(ChatColor.AQUA + "Successfully opened chest inventory.");
+    			}
+    			else
+    			{
+    				sender.sendMessage(ChatColor.RED + "You must specify a player name and message.");
+					sender.sendMessage(ChatColor.RED + "/inv <player>");
+    			}
+    			return true;
+			}
+    		
+    		Player p = plugin.getServer().getPlayer(args[0]);
+    		
+    		if ( p == null )
+    		{
+    			sender.sendMessage(ChatColor.RED + "That player is either offline or never existed.");
+    			return true;
+    		}
+    		
+    		Inventory i = p.getInventory();
+    		
+    		player.openInventory(i);
+    		
+    		return true;
     	}
-    
-    	if ( cmd.getName().equalsIgnoreCase("iadmin") ) // iNations admin commands
+    	else if ( cmd.getName().equalsIgnoreCase("clear") ) // Clear out inventory
+    	{
+    		if ( player == null )
+			{
+				sender.sendMessage(consoleWarning);
+        		return true;    				
+			}
+    		
+    		Inventory i = player.getInventory();
+    		
+    		if ( args.length < 1 )
+    		{
+    			i.clear();    			
+    		}
+    		else if ( args[0].equals("h") )
+    		{
+    			int x;
+    			for (x=0; x<9; x++)
+    			{
+    				i.setItem(x, null);
+    			}
+    		}
+    		else if ( args[0].equals("i") )
+    		{
+    			int x;
+    			for (x=9; x<36; x++)
+    			{
+    				i.setItem(x, null);
+    			}
+    		}
+    		
+    		player.sendMessage( ChatColor.AQUA + "[iNations] " + ChatColor.GOLD + "Successfully cleared your inventory. :D" );
+    		return true;
+    	}
+    	else if ( cmd.getName().equalsIgnoreCase("t") ) // Private chat players even hidden ones
+    	{
+			if ( args.length < 1)
+			{
+				sender.sendMessage(ChatColor.RED + "You must specify a player name and message.");
+				sender.sendMessage(ChatColor.RED + "/t <player> <msg>");
+    			return true;
+			}
+			
+			if ( args.length < 2)
+			{
+				sender.sendMessage(ChatColor.RED + "You must specify a message.");
+				sender.sendMessage(ChatColor.RED + "/t <player> <msg>");
+    			return true;
+			}
+			
+			CommandSender target;
+			
+			if ( args[0].equalsIgnoreCase("console") )
+			{
+				target = (CommandSender) plugin.getServer().getConsoleSender();
+			}
+			else
+			{
+				target = (CommandSender) plugin.getServer().getPlayer(args[0]);
+				
+				if ( target == null )
+				{
+					sender.sendMessage(ChatColor.RED + "That player is either offline or never existed.");
+					return true;
+				}
+			}
+			
+			if ( target == null )
+				return false;
+			
+			int x;
+			String msg = "";
+			
+			for (x=0;x<args.length-1;x++)
+			{
+				msg = msg + " " + args[x + 1];
+			}
+			
+			if ( target instanceof ConsoleCommandSender || ( target instanceof Player && player.canSee( (Player) target ) ) )
+			{
+				sender.sendMessage( ChatColor.RED + "[me -> " + target.getName() + "] " + ChatColor.RESET + ChatColor.translateAlternateColorCodes( "&".charAt(0), msg.trim() ) );
+    			target.sendMessage( ChatColor.RED + "[" + sender.getName() + " -> me] " + ChatColor.RESET + ChatColor.translateAlternateColorCodes( "&".charAt(0), msg.trim() ) );
+    			
+    			if ( target instanceof Player )
+    				plugin.getServer().getConsoleSender().sendMessage( ChatColor.RED + "[" + sender.getName() + " -> " + target.getName() + "] " + ChatColor.RESET + ChatColor.translateAlternateColorCodes( "&".charAt(0), msg.trim() ) );			}
+			else
+			{
+				sender.sendMessage(ChatColor.RED + "That player is either offline or never existed.");
+			}
+			
+			return true;
+    	}
+    	else if ( cmd.getName().equalsIgnoreCase("goto") )
+    	{
+    		if ( player == null )
+			{
+				sender.sendMessage(consoleWarning);
+        		return true;    				
+			}
+			
+			if ( args.length == 2)
+			{
+				sender.sendMessage(ChatColor.RED + "You must specify a player to teleport to.");
+    			return true;
+			}
+			
+			Player target = plugin.getServer().getPlayer(args[0]);
+			
+			if ( target == null )
+			{
+				sender.sendMessage(ChatColor.RED + "That player is either offline or never existed.");
+				return true;
+			}
+			
+			final Player p = player;
+			final Player t = target;
+			
+			if ( target.isOp() || target.hasPermission("inations.admin") )
+			{
+				p.sendMessage(ChatColor.AQUA + "Teleporting you to " + t.getDisplayName() + ChatColor.AQUA + " soon.");
+    			target.sendMessage(ChatColor.RED + "Warning: Teleporting " + player.getDisplayName() + " to your location soon.");
+    			
+    			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+    				public void run() {
+    					p.teleport( t.getLocation() );
+    	    			p.sendMessage(ChatColor.AQUA + "Successfully teleported to " + t.getDisplayName());
+    	    			p.sendMessage(ChatColor.AQUA + "Successfully teleported " + t.getDisplayName() + ChatColor.AQUA + " to you.");
+    				}
+    			}, 100L);
+			}
+			else
+			{
+				p.teleport( t.getLocation() );
+    			p.sendMessage(ChatColor.AQUA + "Successfully teleported to " + t.getDisplayName());
+			}
+			
+			return true;
+    	}
+    	else if ( cmd.getName().equalsIgnoreCase("iadmin") ) // iNations admin commands
     	{
     		if (args.length < 1)
     		{
@@ -40,16 +230,142 @@ public class INationsCommandExecutor implements CommandExecutor {
     			return false;
     		}
     		
+    		if (player == null && (args[0].equals("lock") || args[0].equals("fly")))
+        	{
+        		sender.sendMessage(consoleWarning);
+        		return false;
+        	}
+    		
+    		if ( player != null && ( !player.isOp() || !player.hasPermission("inations.admin") ) )
+    		{
+    			sender.sendMessage("You must have the admin permission to use the iNations Admin Command.");
+    			return false;
+    		}
+    		
     		if ( args[0].equals("help") ) // Help of Sub Commands
     		{
     			sender.sendMessage("/iadmin");
-    			sender.sendMessage("<reload|motd|config>");
+    			sender.sendMessage("<motd|config|save|reload|resume|pause|sample|restart>");
+    			return true;
+    		}
+    		else if ( args[0].equals("sample") ) // Start Message Broadcaster
+    		{
+    			plugin.broadcastMessage();
+    			
+    			return true;
+    		}
+    		else if ( args[0].equals("resume") ) // Start Message Broadcaster
+    		{
+    			plugin.broadEnabled = true;
+    			
+    			sender.sendMessage(ChatColor.AQUA + "[iNations] Message Broadcaster has been resumed.");
+    			return true;
+    		}
+    		else if ( args[0].equals("rego") )
+    		{
+    			Plugin p = plugin.getServer().getPluginManager().getPlugin("iNations");
+        		plugin.getServer().getPluginManager().disablePlugin(p);
+        		plugin.getServer().getPluginManager().enablePlugin(p);
+        		
+        		plugin.sendDebug( "Plugin Reloaded" );
+    		}
+    		else if ( args[0].equals("restart") ) // Start Message Broadcaster
+    		{
+    			if ( plugin.syncId != -1 )
+    				Bukkit.getScheduler().cancelTask(plugin.syncId);
+    			
+    			Long ticks = plugin.getConfig().getLong("globals.msgFreq", 5000L);
+    			
+    			plugin.broadEnabled = true;
+    			plugin.syncId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
+    	    		public void run() {
+    	    			if (plugin.broadEnabled)
+    	    				plugin.broadcastMessage();
+    				}
+    	    		
+    	    	}, 200L, ticks);
+    	    	
+    	    	if ( plugin.syncId == -1 )
+    	    	{
+    	    		sender.sendMessage(ChatColor.AQUA + "[iNations] We have failed to initalize a synced task.");
+    	    	}
+    	    	else
+    	    	{
+    	    		sender.sendMessage(ChatColor.AQUA + "[iNations] Message Broadcaster has been restarted.");
+    	    	}
+    			
+    			return true;
+    		}
+    		else if ( args[0].equals("pause") ) // Start Message Broadcaster
+    		{
+    			plugin.broadEnabled = false;
+    			
+    			sender.sendMessage(ChatColor.AQUA + "[iNations] Message Broadcaster has been paused.");
+    			return true;
+    		}
+    		else if ( args[0].equals("value") )
+    		{
+    			List<Entity> en = player.getWorld().getEntities();
+    			
+    			for ( Entity e : en )
+    			{
+    				if ( e.getType() == EntityType.DROPPED_ITEM )
+    				{
+    					//player.teleport( e.getLocation() );
+    					
+    					//break;
+    					
+    					e.teleport( player.getLocation() );
+    				}
+    			}
+    			
+    			return true;
+    		}
+    		else if ( args[0].equals("updateprices") )
+    		{
+    			//player.getInventory()
+    			
+    			
+    		}
+    		else if ( args[0].equals("test") ) // Test Command
+    		{
+
+    			//player.getItemInHand().addEnchantment(Enchantment.DIG_SPEED, 5);
+    			
+    			player.getItemInHand().removeEnchantment(Enchantment.ARROW_DAMAGE);
+    			
+    			//for ( Plot plot : plugin.iPlots.values() )
+    			//{
+    			//	sender.sendMessage("Player Count in " + plot.plotID + ": " + plot.presentPlayerCount());
+    			//}
+    			
+    			sender.sendMessage(ChatColor.AQUA + "[iNations] Testing Command has been executed. Goodbye.");
+    			return true;
+    		}
+    		else if ( args[0].equals("fly") ) // Test Command
+    		{
+    			player.setAllowFlight(true);
+    			player.setFlying(true);
+    			
+    			sender.sendMessage(ChatColor.AQUA + "We tried to enable fly. Goodday.");
     			return true;
     		}
     		else if ( args[0].equals("reload") ) // Reload Configuration
     		{
+    			//plugin.iPlots = (PlotDataStore) plugin.getConfig().get("plots");
+    			//plugin.getConfig().set("locks", plugin.iLocks);
+    			//plugin.getConfig().set("communities", plugin.iCommunity);
+    			
     			plugin.reloadConfig();
-    			sender.sendMessage("iNations configuration data has been reloaded from file.");
+    			sender.sendMessage(ChatColor.AQUA + "[iNations] Configuration was reloaded from file.");
+    			return true;
+    		}
+    		else if ( args[0].equals("save") ) // Save of Sub-Commands
+    		{
+    			plugin.iPlots.savePlots();
+    			
+    			plugin.saveConfig();
+    			player.sendMessage(ChatColor.AQUA + "[iNations] Configuration was successfully saved.");
     			return true;
     		}
     		else if ( args[0].equals("config") ) // Configuration Sub Command
@@ -76,6 +392,7 @@ public class INationsCommandExecutor implements CommandExecutor {
     			{
     				
     			}
+    			
     			return true;
     		}
     		else if ( args[0].equals("motd") ) // Message of the Day
@@ -100,6 +417,28 @@ public class INationsCommandExecutor implements CommandExecutor {
     			}
     			return true;
     		}
+    		else if ( args[0].equals("lock") )
+    		{
+    			if (args.length < 2)
+    			{
+    				if (plugin.lockWithKey == null)
+    				{
+    					sender.sendMessage("You must specify a keyName.");
+        				sender.sendMessage("/iadmin lock <keyName>");    					
+    				}
+    				else
+    				{
+    					sender.sendMessage("Locking mode has been disabled.");
+    					plugin.lockWithKey = null;
+    				}
+    			}
+    			else
+    			{
+    				plugin.lockWithKey = args[1];
+    				sender.sendMessage(ChatColor.AQUA + "Right-Click the block you would like to lock with the Wooden Axe.");
+    			}
+    			return true;
+    		}
     		
     		// End of Admin Commands.
     		
@@ -108,6 +447,12 @@ public class INationsCommandExecutor implements CommandExecutor {
     	}
     	else if ( cmd.getName().equalsIgnoreCase("iplayer") ) // iNations player commands
     	{
+    		if (player == null)
+        	{
+        		sender.sendMessage("You can not use that command from within console.");
+        		return false;
+        	}
+    		
     		if (args.length < 1)
     		{
     			sender.sendMessage("You must specify a valid sub-command of iNations Player Command Subroutine. See \"/iplayer help\".");
@@ -118,6 +463,74 @@ public class INationsCommandExecutor implements CommandExecutor {
     		{
     			sender.sendMessage("/iplayer");
     			sender.sendMessage("<declare|disban|info|laws|flag|addmember|delmember|teleport|buy|sell>");
+    			return true;
+    		}
+    		else if ( args[0].equals("poke") )
+    		{
+    			if ( args.length == 3)
+    			{
+    				sender.sendMessage(ChatColor.RED + "You must specify a player to poke");
+        			return true;
+    			}
+    			
+    			Player target = plugin.getServer().getPlayer(args[1]);
+    			
+    			if ( target == null )
+    			{
+    				sender.sendMessage(ChatColor.RED + "That player is either offline or never existed.");
+    				return true;
+    			}
+    			
+    			String sdn = ( player == null ) ? sender.getName() : player.getDisplayName();
+    			
+    			target.playEffect(EntityEffect.HURT);
+    			plugin.getServer().broadcastMessage(ChatColor.AQUA + sdn + " just poked " + target.getDisplayName());
+    			
+    			return true;
+    			
+    		}
+    		else if ( args[0].equals("addmember") )
+    		{
+    			if ( args.length == 2)
+    			{
+    				sender.sendMessage(ChatColor.RED + "You must specify a player to add to this plot");
+        			return false;
+    			}
+    			
+    			Vector v = plugin.ChangeCordType(player.getLocation());
+    			Plot plot = plugin.iPlots.getPlotFromVector(v);
+    			
+    			if ( plot == null )
+    			{
+    				player.sendMessage(ChatColor.RED + "You currently are not standing on any claimed land/plot.");
+    			}
+    			else
+    			{
+    				if ( plot.getPlayer() == null || plot.getPlayer() != player )
+        			{
+        				if ( player.isOp() || player.hasPermission("inations.admin") )
+        				{
+        					player.sendMessage(ChatColor.DARK_RED + "You have permission to override the owner of this plot.");
+        				}
+        				else
+        				{
+        					player.sendMessage(ChatColor.DARK_RED + "You don't have permission to add members to this plot.");
+        					return false;
+        				}
+        			}
+    				
+    				if ( args[1] == null || args[1].isEmpty() )
+    					return false;
+    				
+    				Player p = plugin.getServer().getPlayerExact(args[1]);
+    				
+    				if ( p == null )
+    					return false;
+    				
+    				plot.addMember(p);
+    				player.sendMessage(ChatColor.AQUA + "You have successfully addedd player " + p.getDisplayName() + " to this plot.");    				
+    			}
+    			
     			return true;
     		}
     		else if ( args[0].equals("info") ) // Info of Sub-Commands
@@ -141,13 +554,27 @@ public class INationsCommandExecutor implements CommandExecutor {
     			
     			Vector v = plugin.ChangeCordType(player.getLocation());
     			Plot plot = plugin.iPlots.getPlotFromVector(v);
+    			
     			if ( plot == null )
     			{
     				player.sendMessage(ChatColor.RED + "You currently are not standing on any claimed land/plot.");
     			}
     			else
     			{
-    				plugin.db.query("DELETE FROM `plots` WHERE `plotID` = '" + plot.plotID + "';");
+    				if ( plot.getPlayer() == null || plot.getPlayer() != player )
+        			{
+        				if ( player.isOp() || player.hasPermission("inations.admin") )
+        				{
+        					player.sendMessage(ChatColor.DARK_RED + "You have permission to override the owner of this plot.");
+        				}
+        				else
+        				{
+        					player.sendMessage(ChatColor.DARK_RED + "You don't have permission to disban this plot.");
+        					return false;
+        				}
+        			}
+    				
+    				//plugin.db.query("DELETE FROM `plots` WHERE `plotID` = '" + plot.plotID + "';");
     				plugin.iPlots.remove(plot.plotID);
     				player.sendMessage(ChatColor.AQUA + "You have successfully disbaned this plot.");
     			}
@@ -197,8 +624,6 @@ public class INationsCommandExecutor implements CommandExecutor {
 	        			}
 	        		}
 	    		}
-        		
-        		String plotID = loc1.getBlockX() + "_" + loc1.getBlockY() + "_" + loc1.getBlockZ() + "_" + loc2.getBlockX() + "_" + loc2.getBlockY() + "_" + loc2.getBlockZ();
         		
         		int height = plugin.getConfig().getInt("global.ownershipheight", 50);
         		int depth = plugin.getConfig().getInt("global.ownershipdepth", 20);
@@ -483,10 +908,13 @@ public class INationsCommandExecutor implements CommandExecutor {
         		}
         		
         		cube.expand(new Vector(0, height, 0), new Vector(0, 0 - depth, 0));
-        		cube.plotID = plotID;
+        		cube.world = player.getWorld();
         		
         		plugin.iPlots.add(cube);
         		
+        		plugin.getConfig().set("plots." + cube.plotID, cube);
+        		
+        		/*
     			plugin.db.query("INSERT INTO `plots` (" +
     				"`plotID`, " +
     				"`owner`, " +
@@ -517,6 +945,7 @@ public class INationsCommandExecutor implements CommandExecutor {
     				"'" + cube.getPos2().getBlockX() + "', " +
     				"'" + cube.getPos2().getBlockY() + "', " +
     				"'" + cube.getPos2().getBlockZ() + "');");
+    			*/
         		
         		sender.sendMessage(ChatColor.AQUA + "You have just successfully declared land with a sum area of " + cube.getArea() + " blocks.");
         		

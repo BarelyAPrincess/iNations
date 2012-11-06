@@ -3,8 +3,10 @@ package com.chiorichan.bukkit.plugin;
 import java.util.Set;
 
 import org.bukkit.World;
-import org.bukkit.util.BlockVector;
-import org.bukkit.util.Vector;
+
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 
 public interface Region extends Iterable<BlockVector>, Cloneable {
     /**
