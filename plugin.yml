@@ -1,8 +1,8 @@
 name: iNations
 author: Chiori Greene
 main: com.chiorichan.bukkit.plugin.iNations.INations
-version: '0.1'
-depends: [Vault]
+version: '0.7.0506 (Apple Tree)'
+depends: [Vault,WorldEdit,WorldGuard,GriefPrevention]
 
 commands:
      iplayer:
@@ -17,9 +17,27 @@ commands:
      clear:
           description: Allows for instant clear of inventory.
           usage: /clear [h/i]
-     t:
+     tell:
           description: Allows for private chat for staff even when hidden. Alt Colors Supported.
-          usage: /t <playersname> <message>
+          usage: /tell <playersname> <message>
      goto:
           description: Allows you to teleport to players. Gives OP's a warning of teleport.
-          usage: /goto <playersname>
+          usage: /goto <playername>
+     t:
+          description: Allows for private chat for staff even when hidden. Alt Colors Supported.
+          usage: /t <playername/groupname> <message>
+     o:
+          description: Switch to or message the OP Chat 
+          usage: /o [optional message]
+     q:
+          description: Switch to or message the Specified Chat
+          usage: /q <Chat Name> [optional message]
+     e:
+          description: Switch to or message the Staff Chat
+          usage: /e [optional message]
+     c:
+          description: Switch to or message your Class Chat
+          usage: /c [optional message]
+     g:
+          description: Switch to or message the Global Chat
+          usage: /g [optional message]

@@ -1,20 +1,77 @@
 global:
-    motd: 'Welcome to the United Federation of Harmony.'
-    autofence: true
-    autostack: true
-    autotorches: true
-    ownershipdepth: 0
-    ownershipheight: 0
-    minpop: 5
-    minarea: 100
-    minplots: 2
-    maxdistance: 30
-    maxpop: 50
-    maxarea: 10000
-    primaryArea: ''
-    protectbuilds: true
-    allowanimals: true
-    allowbadmobs: true
-    allowothermobs: true
-    alloweggspawns: true
-    maxperplayer: 3
+  motd: 'Welcome to the United Federation of Harmony.'
+  motd_prefix: 'UFoHarmony BigDig Devision'
+  motd_suffix: '<-- 20% Bonus Size'
+  server_addr: localhost
+  server_port: 1040
+  remote_enabled: false
+  doubledoors: true
+  motd_enabled: false
+  msgFreq: 90000
+  msgTitle: '&d[Announcement]'
+chat:
+  enabled: true
+  longFormat: '<&l&5[{chat_name}] {class_color}[{class_name}] {group_color}[{group_name}] &6{display_name}&r> {msg}'
+  shortFormat: '<&l&5[{chat_name}] &6{display_name}&r> {msg}'
+  shortTimeout: 10000
+  globalChatName: 'Global Chat'
+  leaveFormat: '&f[&2+&f] &6{display_name}'
+  joinFormat: '&f[&2-&f] &6{display_name}'
+messages:
+  id1: ''
+clatRooms: []
+classes:
+  default: Awakened
+  EarthPony:
+    speed: 3
+    canFly: false
+    earthDrop: true
+  Unicorn:
+    speed: -1
+    useMagic: true
+  Griffon:
+    speed: -1
+    useMagic: false
+    claws: true
+  Pegasus:
+    canFly: true
+  Alicorn:
+    canFly: true
+    useMagic: true
+  Changling:
+    canFly: true
+    disguise: true
+lockable_doors:
+- 31737
+- 31995
+- 11083
+- 1065
+- 3710
+- 1769
+- 2026
+admin_doors:
+- 229
+- 11083
+- 1065
+- 2026
+groups:
+  Administrator:
+    color: '&d'
+  Moderator:
+    color: '&3'
+  VIP:
+    color: '&6'
+  Applicant:
+    color: '&6'
+  Builder:
+    color: '&6'
+  Donator:
+    color: '&2'
+  Member:
+    color: '&9'
+  Pegasus:
+    color: '&9'
+  Guest:
+    color: '&7'
+  BanishedPlayer:
+    color: '&0'
